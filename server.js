@@ -2,9 +2,11 @@ const express = require('express');
 const app = express();
 var path = require('path');
 var fs = require('fs');
+const util = require('util');
 app.use(express.static(path.join(__dirname, 'public')));
 var bodyParser = require('body-parser');
 const port = process.env.PORT || 4123;
+const noneLogLevel = 'none';
 const infoLogLevel = 'info';
 const debugLogLevel = 'debug';
 const logLevel = process.env.LOG_LEVEL || infoLogLevel;
@@ -35,14 +37,21 @@ function getFullPath(path) {
 function isExists(path) {
     return fs.existsSync(getFullPath(path));
 }
-function log(level, message) {
+function log(level, message, obj) {
+    if (logLevel == noneLogLevel) {
+        return
+    }
     if (logLevel !== debugLogLevel && level === debugLogLevel) {
         return;
     }
-    console.log(message)
+    if (obj) {
+        console.log(message, obj)
+    } else {
+        console.log(message)
+    }
 }
 app.get('/read', (req, res) => {
-    log(infoLogLevel, '[GET] read query: ' + req.query);
+    log(infoLogLevel, '[GET] read', req.query);
 
     let status = 200;
     let response = {};
@@ -65,7 +74,7 @@ app.get('/read', (req, res) => {
     log(debugLogLevel, '');
 });
 app.get('/exists', (req, res) => {
-    log(infoLogLevel, '[GET] exists - query: ' + req.query);
+    log(infoLogLevel, '[GET] exists', req.query);
 
     var filePath = getFilePath(req.query.file_path);
     const status = 200;
@@ -78,7 +87,7 @@ app.get('/exists', (req, res) => {
     log(debugLogLevel, '')
 });
 app.post('/save', jsonParser, (req, res) => {
-    log(infoLogLevel, '[POST] save - query: ' + req.query);
+    log(infoLogLevel, '[POST] save', req.query);
     log(debugLogLevel, 'body:');
     log(debugLogLevel, req.body);
 

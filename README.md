@@ -1,5 +1,5 @@
 # node-fs-server
-simple node file system http server
+simple node file system http server for storing and serving JSON files
 ```
 npm run server
 ```
